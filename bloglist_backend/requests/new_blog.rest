@@ -1,0 +1,10 @@
+POST  http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1haXNhIiwiaWQiOiI1YzZhYzE1Y2I0NmZjYTcyOGI2ZjZiYWQiLCJpYXQiOjE1NTA1MDAyMDR9.clTnyXJQrJ2pqgXbFY97rMn-120j6osl0LKUlVVNsMo
+
+{
+   "title": "Mallan blogi",
+   "author": "Malla",
+   "url": "http://blog.mara.html",
+   "likes": 39000
+}
