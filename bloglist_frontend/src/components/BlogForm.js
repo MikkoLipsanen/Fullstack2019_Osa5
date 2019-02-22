@@ -1,43 +1,57 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
-const BlogForm = (props) => (
+const BlogForm = ({ addBlog, newTitle, handleTitleChange, newAuthor, handleAuthorChange, 
+  newUrl, handleUrlChange, newLikes, handleLikesChange }) => (
   <div>
-    <form onSubmit={props.addBlog}>
+    <form onSubmit={addBlog}>
       <div>
         title: 
-          <input 
+        <input 
           type="text"
-          value={props.newTitle} 
-          onChange={props.handleTitleChange}
+          value={newTitle} 
+          onChange={handleTitleChange}
         />
       </div>
       <div> 
         author: 
-          <input 
+        <input 
           type="text"
-          value={props.newAuthor}
-          onChange={props.handleAuthorChange}
+          value={newAuthor}
+          onChange={handleAuthorChange}
         />
       </div>
       <div> 
         url: 
-          <input 
+        <input 
           type="text"
-          value={props.newUrl} 
-          onChange={props.handleUrlChange}
+          value={newUrl} 
+          onChange={handleUrlChange}
         />
       </div>
       <div> 
         likes: 
-          <input 
+        <input 
           type="text"
-          value={props.newLikes} 
-          onChange={props.handleLikesChange}
+          value={newLikes} 
+          onChange={handleLikesChange}
         />
       </div>
       <button type="submit">create</button>
     </form>  
   </div>
 )
+
+BlogForm.propTypes = {
+  addBlog: PropTypes.func.isRequired,
+  handleTitleChange: PropTypes.func.isRequired,
+  handleAuthorChange: PropTypes.func.isRequired,
+  handleUrlChange: PropTypes.func.isRequired,
+  handleLikesChange: PropTypes.func.isRequired,
+  newTitle: PropTypes.string.isRequired,
+  newAuthor: PropTypes.string.isRequired,
+  newUrl: PropTypes.string.isRequired,
+  newLikes: PropTypes.string.isRequired,
+}
 
 export default BlogForm

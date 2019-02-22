@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
-import loginService from './services/login' 
+import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
@@ -14,17 +14,17 @@ const App = () => {
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
   const [newLikes, setNewLikes] = useState('')
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
-  const [user, setUser] = useState(null) 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
   const [notification, setNotification] = useState({
     message: null
   })
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+      setBlogs(blogs)
+    )
   }, [])
 
   useEffect(() => {
@@ -36,32 +36,48 @@ const App = () => {
     }
   }, [])
 
-  const notify = (message, type='success') => {
+  const notify = (message, type = 'success') => {
     setNotification({ message, type })
     setTimeout(() => setNotification({ message: null }), 10000)
   }
 
   const addBlog = (event) => {
     event.preventDefault()
-      const blogObject = {
-        title: newTitle,
-        author: newAuthor,
-        url: newUrl,
-        likes: newLikes
-      }
+    const blogObject = {
+      title: newTitle,
+      author: newAuthor,
+      url: newUrl,
+      likes: newLikes
+    }
 
+    blogService
+      .create(blogObject).then(returnedBlog => {
+        setBlogs(blogs.concat(returnedBlog))
+        setNewTitle('')
+        setNewAuthor('')
+        setNewUrl('')
+        setNewLikes('')
+        notify(`A new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
+      })
+      .catch(error => {
+        notify('Blog creation failed', 'error')
+      })
+  }
+
+  const deleteBlog = (id) => {
+    const blog = blogs.find(b => b.id === id)
+    const ok = window.confirm(`Remove blog ${blog.title} ${blog.author}`)
+    if (ok) {
       blogService
-        .create(blogObject).then(returnedBlog => {
-          setBlogs(blogs.concat(returnedBlog))
-          setNewTitle('')
-          setNewAuthor('')
-          setNewUrl('')
-          setNewLikes('')
-          notify(`A new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
+        .remove(id)
+        .then(() => {
+          setBlogs(blogs.filter(b => b.id !== id))
+          notify(`${blog.title} ${blog.author} was deleted`)
         })
         .catch(error => {
-          notify(`Blog creation failed`, 'error')        
+          notify('Blog deletion failed', 'error')
         })
+    }
   }
 
   const handleLogin = async (event) => {
@@ -73,7 +89,7 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
-      ) 
+      )
 
       blogService.setToken(user.token)
       setUser(user)
@@ -81,7 +97,7 @@ const App = () => {
       setPassword('')
       notify(`${user.name} logged in`)
     } catch (exception) {
-      notify(`Wrong username or password`, 'error')
+      notify('Wrong username or password', 'error')
     }
   }
 
@@ -90,12 +106,31 @@ const App = () => {
     notify(`${user.name} logged out`)
   }
 
-  const rows = () => blogs.map(blog =>
-    <Blog 
-      key={blog.id} 
-      blog={blog}
-    />
-  )
+  const addLike = id => {
+    const blog = blogs.find(b => b.id === id)
+    
+    const changedBlog = {
+      ...blog,
+      likes: blog.likes + 1,
+    }
+
+    blogService
+      .update(changedBlog.id, changedBlog).then(returnedBlog => {
+        setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
+      })
+  }
+
+  const rows = () => [...blogs]
+    .sort((a, b) => b.likes - a.likes)
+    .map(blog =>
+      <Blog
+        key={blog.id}
+        blog={blog}
+        addLike={() => addLike(blog.id)}
+        remove={() => deleteBlog(blog.id)}
+      />
+    )
+
 
   const handleTitleChange = (event) => {
     setNewTitle(event.target.value)
@@ -127,34 +162,34 @@ const App = () => {
         <div>
           <h2>Log in to application</h2>
           <Notification notification={notification} />
-          <LoginForm 
-            notification={notification} 
-            handleLogin={handleLogin} 
-            password={password} 
-            handleUsernameChange={handleUsernameChange} 
-            handlePasswordChange={handlePasswordChange} /> 
+          <LoginForm
+            handleLogin={handleLogin}
+            password={password}
+            username={username}
+            handleUsernameChange={handleUsernameChange}
+            handlePasswordChange={handlePasswordChange} />
         </div> :
         <div>
           <h2>blogs</h2>
           <Notification notification={notification} />
           <p>{user.name} logged in</p>
-          <button onClick = {handleLogout}>logout </button>
+          <button onClick={handleLogout}>logout </button>
           <Togglable buttonLabel="new blog">
-            <BlogForm 
-              addBlog={addBlog} 
-              newTitle={newTitle} 
+            <BlogForm
+              addBlog={addBlog}
+              newTitle={newTitle}
               handleTitleChange={handleTitleChange}
-              newAuthor={newAuthor} 
-              handleAuthorChange={handleAuthorChange} 
-              newUrl={newUrl} 
+              newAuthor={newAuthor}
+              handleAuthorChange={handleAuthorChange}
+              newUrl={newUrl}
               handleUrlChange={handleUrlChange}
-              newLikes={newLikes} 
-              handleLikesChange={handleLikesChange} 
+              newLikes={newLikes}
+              handleLikesChange={handleLikesChange}
             />
           </Togglable>
           <ul>
             {rows()}
-          </ul> 
+          </ul>
         </div>
       }
     </div>
