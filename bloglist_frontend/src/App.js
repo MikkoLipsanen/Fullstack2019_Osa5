@@ -1,29 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login' 
+import LoginForm from './components/LoginForm'
+import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 
-const Notification = ({ notification }) => {
-  if (notification.message === null) {
-    return null
-  }
-
-  const style = {
-    color: notification.type === 'error' ? 'red' : 'green',
-    background: 'lightgrey',
-    fontSize: 20,
-    borderStyle: 'solid',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-  }
-
-  return (
-    <div style={style}>
-      {notification.message}
-    </div>
-  )
-}
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -114,85 +97,62 @@ const App = () => {
     />
   )
 
-  const loginForm = () => (
-    <div>
-        <h2>Log in to application</h2>
-        <Notification notification={notification} />
-        <form onSubmit={handleLogin}>
-          <div>
-            käyttäjätunnus
-              <input
-              type="text"
-              value={username}
-              name="Username"
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </div>
-          <div>
-            salasana
-              <input
-              type="password"
-              value={password}
-              name="Password"
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </div>
-          <button type="submit">kirjaudu</button>
-        </form>
-      </div>
-  )
+  const handleTitleChange = (event) => {
+    setNewTitle(event.target.value)
+  }
 
-  const blogForm = () => (
-    <div>
-      <form onSubmit={addBlog}>
-        <div>
-          title: 
-            <input 
-            type="text"
-            value={newTitle} 
-            onChange={({ target }) => setNewTitle(target.value)}
-          />
-        </div>
-        <div> 
-          author: 
-            <input 
-            type="text"
-            value={newAuthor}
-            onChange={({ target }) => setNewAuthor(target.value)}
-          />
-        </div>
-        <div> 
-          url: 
-            <input 
-            type="text"
-            value={newUrl} 
-            onChange={({ target }) => setNewUrl(target.value)}
-          />
-        </div>
-        <div> 
-          likes: 
-            <input 
-            type="text"
-            value={newLikes} 
-            onChange={({ target }) => setNewLikes(target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>  
-    </div>
-  )
+  const handleAuthorChange = (event) => {
+    setNewAuthor(event.target.value)
+  }
 
+  const handleUrlChange = (event) => {
+    setNewUrl(event.target.value)
+  }
+
+  const handleLikesChange = (event) => {
+    setNewLikes(event.target.value)
+  }
+
+  const handleUsernameChange = (event) => {
+    setUsername(event.target.value)
+  }
+
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value)
+  }
+  
   return (
     <div>
       {user === null ?
-        loginForm() :
+        <div>
+          <h2>Log in to application</h2>
+          <Notification notification={notification} />
+          <LoginForm 
+            notification={notification} 
+            handleLogin={handleLogin} 
+            password={password} 
+            handleUsernameChange={handleUsernameChange} 
+            handlePasswordChange={handlePasswordChange} /> 
+        </div> :
         <div>
           <h2>blogs</h2>
           <Notification notification={notification} />
           <p>{user.name} logged in</p>
           <button onClick = {handleLogout}>logout </button>
           <h2>create new</h2>
-            {blogForm()}
+          <Togglable buttonLabel="new blog">
+            <BlogForm 
+              addBlog={addBlog} 
+              newTitle={newTitle} 
+              handleTitleChange={handleTitleChange}
+              newAuthor={newAuthor} 
+              handleAuthorChange={handleAuthorChange} 
+              newUrl={newUrl} 
+              handleUrlChange={handleUrlChange}
+              newLikes={newLikes} 
+              handleLikesChange={handleLikesChange} 
+            />
+          </Togglable>
           <ul>
             {rows()}
           </ul> 
