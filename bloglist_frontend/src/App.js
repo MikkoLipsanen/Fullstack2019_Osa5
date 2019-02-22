@@ -41,11 +41,6 @@ const App = () => {
     setTimeout(() => setNotification({ message: null }), 10000)
   }
 
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    notify(`${user.name} logged out`)
-  }
-
   const addBlog = (event) => {
     event.preventDefault()
       const blogObject = {
@@ -90,6 +85,11 @@ const App = () => {
     }
   }
 
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser')
+    notify(`${user.name} logged out`)
+  }
+
   const rows = () => blogs.map(blog =>
     <Blog 
       key={blog.id} 
@@ -120,7 +120,7 @@ const App = () => {
   const handlePasswordChange = (event) => {
     setPassword(event.target.value)
   }
-  
+
   return (
     <div>
       {user === null ?
@@ -139,7 +139,6 @@ const App = () => {
           <Notification notification={notification} />
           <p>{user.name} logged in</p>
           <button onClick = {handleLogout}>logout </button>
-          <h2>create new</h2>
           <Togglable buttonLabel="new blog">
             <BlogForm 
               addBlog={addBlog} 
