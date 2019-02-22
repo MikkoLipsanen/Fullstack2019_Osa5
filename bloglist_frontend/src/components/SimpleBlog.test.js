@@ -1,7 +1,31 @@
 import React from 'react'
 import 'jest-dom/extend-expect'
-import { render, cleanup } from 'react-testing-library'
+import { render, cleanup, fireEvent } from 'react-testing-library'
+import { prettyDOM } from 'dom-testing-library' 
 import SimpleBlog from './SimpleBlog'
+
+
+it('clicking the button twice calls event handler twice', async () => {
+  const blog = {
+    title: 'Tiedän mitä koodasit viime kesänä',
+    author: 'Hannu Salama',
+    likes: 567
+  }
+
+  const mockHandler = jest.fn()
+
+  const { getByText } = render(
+    <SimpleBlog blog={blog} onClick={mockHandler} />
+  )
+
+  afterEach(cleanup)
+
+  const button = getByText('like')
+  fireEvent.click(button)
+  fireEvent.click(button)
+
+  expect(mockHandler.mock.calls.length).toBe(2)
+})
 
 test('renders content', () => {
   const blog = {
@@ -15,8 +39,6 @@ test('renders content', () => {
   )
 
   afterEach(cleanup)
-
-  component.debug()
 
   expect(component.container).toHaveTextContent(
     'Tiedän mitä koodasit viime kesänä' 
