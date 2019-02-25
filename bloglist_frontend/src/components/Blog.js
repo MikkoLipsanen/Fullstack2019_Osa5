@@ -15,7 +15,7 @@ const Blog = ({ blog, addLike, remove }) => {
 
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       <div onClick={() => setShow(!show)}>
         {blog.title} {blog.author}
         {show && <div>

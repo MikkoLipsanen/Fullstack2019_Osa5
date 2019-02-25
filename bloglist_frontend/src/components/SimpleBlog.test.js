@@ -1,7 +1,6 @@
 import React from 'react'
 import 'jest-dom/extend-expect'
 import { render, cleanup, fireEvent } from 'react-testing-library'
-import { prettyDOM } from 'dom-testing-library' 
 import SimpleBlog from './SimpleBlog'
 
 

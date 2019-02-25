@@ -6,21 +6,22 @@ import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
+import  { useField } from './hooks/index.js'
 
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
-  const [newLikes, setNewLikes] = useState('')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const username = useField('text')
+  const password = useField('password')
+  const title = useField('text')
+  const author = useField('text')
+  const url = useField('text')
+  const likes = useField('text')
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState({
     message: null
   })
-
+ 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs(blogs)
@@ -44,19 +45,19 @@ const App = () => {
   const addBlog = (event) => {
     event.preventDefault()
     const blogObject = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl,
-      likes: newLikes
+      title: title.value,
+      author: author.value,
+      url: url.value,
+      likes: likes.value
     }
 
     blogService
       .create(blogObject).then(returnedBlog => {
         setBlogs(blogs.concat(returnedBlog))
-        setNewTitle('')
-        setNewAuthor('')
-        setNewUrl('')
-        setNewLikes('')
+        title.reset()
+        author.reset()
+        url.reset()
+        likes.reset()
         notify(`A new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
       })
       .catch(error => {
@@ -81,10 +82,13 @@ const App = () => {
   }
 
   const handleLogin = async (event) => {
+    const uName = username.value
+    const pWord = password.value
     event.preventDefault()
     try {
       const user = await loginService.login({
-        username, password,
+        username: uName,
+        password: pWord,
       })
 
       window.localStorage.setItem(
@@ -93,11 +97,11 @@ const App = () => {
 
       blogService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
       notify(`${user.name} logged in`)
     } catch (exception) {
       notify('Wrong username or password', 'error')
+      username.reset()
+      password.reset()
     }
   }
 
@@ -130,32 +134,7 @@ const App = () => {
         remove={() => deleteBlog(blog.id)}
       />
     )
-
-
-  const handleTitleChange = (event) => {
-    setNewTitle(event.target.value)
-  }
-
-  const handleAuthorChange = (event) => {
-    setNewAuthor(event.target.value)
-  }
-
-  const handleUrlChange = (event) => {
-    setNewUrl(event.target.value)
-  }
-
-  const handleLikesChange = (event) => {
-    setNewLikes(event.target.value)
-  }
-
-  const handleUsernameChange = (event) => {
-    setUsername(event.target.value)
-  }
-
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value)
-  }
-
+  
   return (
     <div>
       {user === null ?
@@ -164,10 +143,9 @@ const App = () => {
           <Notification notification={notification} />
           <LoginForm
             handleLogin={handleLogin}
-            password={password}
-            username={username}
-            handleUsernameChange={handleUsernameChange}
-            handlePasswordChange={handlePasswordChange} />
+            username={username.propsHook}
+            password={password.propsHook}
+          />
         </div> :
         <div>
           <h2>blogs</h2>
@@ -177,14 +155,10 @@ const App = () => {
           <Togglable buttonLabel="new blog">
             <BlogForm
               addBlog={addBlog}
-              newTitle={newTitle}
-              handleTitleChange={handleTitleChange}
-              newAuthor={newAuthor}
-              handleAuthorChange={handleAuthorChange}
-              newUrl={newUrl}
-              handleUrlChange={handleUrlChange}
-              newLikes={newLikes}
-              handleLikesChange={handleLikesChange}
+              title={title.propsHook}
+              author={author.propsHook}
+              url={url.propsHook}
+              likes={likes.propsHook}
             />
           </Togglable>
           <ul>
